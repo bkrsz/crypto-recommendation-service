@@ -1,0 +1,28 @@
+server:
+  port: 5001
+
+spring:
+  application:
+    name: crypto-recommendation-service
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: false
+  cache:
+    type: jcache
+    cache-names:
+      - rate-limit-buckets
+    caffeine:
+      spec: maximumSize=100000,expireAfterAccess=3600s
+
+bucket4j:
+  enabled: true
+  filters:
+    - cache-name: rate-limit-buckets
+      url: /crypto.*
+      rate-limits:
+        - expression: "getRemoteAddr()"
+          bandwidths:
+            - capacity: 10
+              time: 1
+              unit: minutes
